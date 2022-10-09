@@ -4,11 +4,9 @@ import en from "./en";
 import hk from "./hk";
 import util from "@util";
 const i18n = createI18n({
-  locale: "en", // 定义默认语言
+  locale: util.lang, // 定义默认语言
   legacy: false,
   globalInjection: true,
-  // eslint-disable-next-line no-dupe-keys
-  locale: util.lang,
   messages: {
     zh,
     en,

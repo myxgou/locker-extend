@@ -28,9 +28,23 @@
         <el-form-item :label="$t('rentCash')" prop="rentCash">
           <el-input v-model="rentData.rentCash" autocomplete="off" />
         </el-form-item>
-        <el-form-item :label="$t('rentPeriod')" prop="rentDateRange">
+        <el-form-item :label="$t('rentPeriod')" prop="rentPeriodType">
+          <el-select
+            v-model="rentData.rentPeriodType"
+            :placeholder="$t('selectRentPeriodType')"
+            size="large"
+          >
+            <el-option
+              v-for="item in rentPeriodTypeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="rentPeriod">
           <el-date-picker
-            v-model="rentData.rentDateRange"
+            v-model="rentData.rentPeriod"
             type="daterange"
             :range-separator="$t('to')"
             :start-placeholder="$t('startDate')"
@@ -56,18 +70,26 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, getCurrentInstance } from "vue";
+const { $config, $t } = getCurrentInstance() as any;
 const rentData = ref({
   unitNo: "",
   rentCash: "0.00",
-  rentDateRange: [],
+  rentPeriodType: "",
+  rentPeriod: [],
 });
+const rentPeriodTypeList = computed(() =>
+  $config.rent.rentPeriodTypeList.map(
+    (item: { label: string; value: number }) => (item.label = $t(item.label))
+  )
+);
 const rules = ref({
   unitNo: {},
+  rentPeriodType: "",
   rentCash: {
     required: true,
   },
-  rentDateRange: {
+  rentPeriod: {
     required: true,
   },
 });
