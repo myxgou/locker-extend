@@ -70,8 +70,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, getCurrentInstance } from "vue";
-const { $config, $t } = getCurrentInstance() as any;
+import { ref, computed, getCurrentInstance, watch } from "vue";
+const { $config, $t } = getCurrentInstance()?.appContext.app.config.globalProperties;
 const rentData = ref({
   unitNo: "",
   rentCash: "0.00",
@@ -79,9 +79,13 @@ const rentData = ref({
   rentPeriod: [],
 });
 const rentPeriodTypeList = computed(() =>
-  $config.rent.rentPeriodTypeList.map(
-    (item: { label: string; value: number }) => (item.label = $t(item.label))
-  )
+  {
+    return $config?.rent?.rentPeriodTypeList?.map((item: { label: string, value: any }) => {
+      let mixItem = item;
+      mixItem.label = $t(item.label);
+      return mixItem
+    }) ?? [];
+  }
 );
 const rules = ref({
   unitNo: {},
@@ -93,6 +97,10 @@ const rules = ref({
     required: true,
   },
 });
+
+watch(() => rentData.unitNo, (value) => {
+  console.log(value);
+})
 const submitForm = () => {
   console.log(11);
 };
