@@ -23,28 +23,29 @@
         label-width="120px"
       >
         <el-form-item :label="$t('unitNo')" prop="unitNo">
-          <el-input v-model="rentData.unitNo" autocomplete="off" />
+          <el-input v-model="rentData.unitNo" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label="$t('rentCash')" prop="rentCash">
-          <el-input v-model="rentData.rentCash" autocomplete="off" />
+          <el-input :placeholder="$t('enterRent')" @keyup="rentCashParser" v-model="rentData.rentCash" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label="$t('rentPeriod')" prop="rentPeriodType">
+        <el-form-item :label="$t('leaseType')" prop="leaseType">
           <el-select
-            v-model="rentData.rentPeriodType"
-            :placeholder="$t('selectRentPeriodType')"
+            v-model="rentData.leaseType"
+            :placeholder="$t('selectLeaseType')"
             size="large"
           >
             <el-option
-              v-for="item in rentPeriodTypeList"
+              v-for="item in leaseTypeList"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
+          <el-input-number size="large" class="lease-type-number" v-model="rentData.leaseTypeNumber" :min="1" :disabled="rentData.leaseTypeNumberDisabled" />
         </el-form-item>
-        <el-form-item prop="rentPeriod">
+        <el-form-item :label="$t('leaseTerm')" prop="leaseTerm">
           <el-date-picker
-            v-model="rentData.rentPeriod"
+            v-model="rentData.leaseTerm"
             type="daterange"
             :range-separator="$t('to')"
             :start-placeholder="$t('startDate')"
@@ -53,8 +54,8 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm">CALC</el-button>
-          <el-button @click="resetForm">Reset</el-button>
+          <el-button type="primary" @click="submitForm">{{$t('calc')}}</el-button>
+          <el-button @click="resetForm">{{$t('reset')}}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -70,17 +71,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, getCurrentInstance, watch } from "vue";
+import { ref, reactive, computed, getCurrentInstance, watch } from "vue";
 const { $config, $t } = getCurrentInstance()?.appContext.app.config.globalProperties;
-const rentData = ref({
+import app from "@/util/app";
+
+const rentData = reactive({
   unitNo: "",
-  rentCash: "0.00",
-  rentPeriodType: "",
-  rentPeriod: [],
+  rentCash: '',
+  leaseTypeNumber: 1,
+  leaseTypeNumberDisabled: false,
+  leaseType: $config?.rent.leaseTypeByMonth,
+  leaseTerm: [],
 });
-const rentPeriodTypeList = computed(() =>
+
+const leaseTypeList = computed(() =>
   {
-    return $config?.rent?.rentPeriodTypeList?.map((item: { label: string, value: any }) => {
+    return $config?.rent?.leaseTypeList?.map((item: { label: string, value: any }) => {
       let mixItem = item;
       mixItem.label = $t(item.label);
       return mixItem
@@ -89,25 +95,37 @@ const rentPeriodTypeList = computed(() =>
 );
 const rules = ref({
   unitNo: {},
-  rentPeriodType: "",
+  leaseType: "",
   rentCash: {
     required: true,
   },
-  rentPeriod: {
+  leaseTerm: {
     required: true,
   },
 });
 
-watch(() => rentData.unitNo, (value) => {
-  console.log(value);
+watch(() => [rentData.leaseType, rentData.leaseTerm], (newValue, oldValue) => {
+  rentData.leaseTypeNumberDisabled = false;
+  console.log(newValue, oldValue);
 })
+
 const submitForm = () => {
   console.log(11);
 };
 
 const resetForm = () => {
-  console.log(222);
+  rentData.unitNo = ''
+  rentData.rentCash = '0.00'
+  rentData.leaseTypeNumber = 1;
+  rentData.leaseTypeNumberDisabled = false;
+  rentData.leaseTerm = []
+  rentData.leaseType = $config?.rent.leaseTypeByMonth
 };
+
+const rentCashParser = () => {
+  rentData.rentCash = `${$config.rent.cashUnit} ${app.util.toCash(rentData.rentCash)}` 
+}
+
 </script>
 <style lang="scss" scoped>
 .content-board {
@@ -139,6 +157,9 @@ const resetForm = () => {
     flex: 1;
     display: flex;
     flex-direction: column;
+    .lease-type-number {
+      margin-left: 15px;
+    }
   }
   .bottom-board {
     height: 30px;

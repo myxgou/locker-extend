@@ -15,4 +15,18 @@ export default {
       return "en";
     }
   },
+  util: {
+    toCash(val: string | number) {
+      if (typeof val === 'number') {
+        return val.toFixed(2);
+      }
+      if (typeof val === 'string') {
+        let temp: any = val.replace(/[^0-9.]/g, '')
+        if (isNaN(temp)) {
+          return '0.00'
+        }
+        return (temp - 0).toFixed(2)
+      }
+    }
+  }
 };

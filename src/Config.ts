@@ -7,20 +7,21 @@ export default {
     },
   },
   rent: {
-    rentPeriodTypeByMonth: 0,
-    rentPeriodTypeByWeek: 1,
-    rentPeriodTypeByDay: 2,
-    rentPeriodTypeList: [
+    cashUnit: '$',
+    leaseTypeByMonth: 0,
+    leaseTypeByWeek: 1,
+    leaseTypeByDay: 2,
+    leaseTypeList: [
       {
-        label: "periodByMonth",
+        label: "leaseByMonth",
         value: 0,
       },
       {
-        label: "periodByWeek",
+        label: "leaseByWeek",
         value: 1,
       },
       {
-        label: "periodByDay",
+        label: "leaseByDay",
         value: 2,
       },
     ],
